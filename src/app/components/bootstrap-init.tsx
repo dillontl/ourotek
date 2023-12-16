@@ -12,4 +12,5 @@ export default function BootstrapInit() {
         // @ts-ignore
         import ('bootstrap/dist/js/bootstrap.js');
     }, []);
+    return <></>
 }

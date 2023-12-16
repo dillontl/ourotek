@@ -10,7 +10,7 @@ export default function MainHero(){
                         Ourotek unleashes future potential through <u className="uline">technological finesse.</u>
                     </p>
                     <div className="d-grid gap-2 d-md-flex justify-content-md-start mb-4 mb-lg-3">
-                        <button type="button" className="btn btn-primary btn-lg px-4 me-md-2 fw-bold">Let's Talk
+                        <button type="button" className="btn btn-primary btn-lg px-4 me-md-2 fw-bold">Let&aposs Talk
                         </button>
                         <button type="button" className="btn btn-outline-secondary btn-lg px-4">Articles</button>
                     </div>
