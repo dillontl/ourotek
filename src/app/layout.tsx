@@ -4,6 +4,7 @@ import { IBM_Plex_Mono } from 'next/font/google'
 import './globals.css'
 import Navigation from "@/app/components/navigation";
 import BootstrapInit from "@/app/components/bootstrap-init";
+import '@fortawesome/fontawesome-svg-core/styles.css'
 
 const ibmPlexMono = IBM_Plex_Mono({ subsets: ['latin'], weight: ['100', '200', '300', '400', '500', '600', '700'] })
 

@@ -9,6 +9,8 @@ import {useEffect} from "react";
  * */
 export default function BootstrapInit() {
     useEffect(() => {
+        // @ts-ignore
         import ('bootstrap/dist/js/bootstrap.js');
     }, []);
+    return <></>
 }
