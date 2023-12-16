@@ -1,8 +1,11 @@
+import ColumnIcon from "@/app/components/column-icon";
+
 export default function MainAccordion(){
     return (
         <div className="my-5 container">
             <div className="pe-lg-0 align-items-center rounded-3 border shadow-lg">
-                <div className="my-5 mx-5">
+                <ColumnIcon />
+                <div className="my-3 mx-5">
                     <div className="accordion accordion-flush">
                         <h2>How We Roll</h2>
                         <div className="accordion-item">
