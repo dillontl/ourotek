@@ -1,9 +1,13 @@
 import Image from 'next/image'
-import styles from './page.module.css'
+import './page.module.css'
+import MainAccordion from "@/app/components/main-accordion";
+import MainHero from "@/app/components/main-hero";
 
 export default function Home() {
   return (
-    <main className={styles.main}>
-    </main>
+      <main>
+          <MainHero />
+          <MainAccordion />
+      </main>
   )
 }
