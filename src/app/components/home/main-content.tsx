@@ -1,3 +1,5 @@
+import GlobeAnimation from "@/app/components/lottie/globe-animation";
+
 export default function MainContent() {
     return (
         <div className="my-5 container">
@@ -19,6 +21,7 @@ export default function MainContent() {
                     </p>
 
                 </div>
+                <GlobeAnimation />
             </div>
         </div>
     )
