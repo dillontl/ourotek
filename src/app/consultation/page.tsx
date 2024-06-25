@@ -140,12 +140,11 @@ export default function Page() {
                                 </div>
                             )}
                             <div className="mb-3">
-                                <label htmlFor="summary" className="form-label">Summary of What's Needed</label>
+                                <label htmlFor="summary" className="form-label">Summary of What&apos;s Needed</label>
                                 <textarea
                                     className="form-control"
                                     id="summary"
                                     name="summary"
-                                    rows="3"
                                     value={formData.summary}
                                     onChange={handleChange}
                                 ></textarea>
