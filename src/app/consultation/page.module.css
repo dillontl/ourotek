@@ -1,0 +1,31 @@
+.consultForm {
+    /*margin-left: 20%;*/
+    /*margin-right: 20%;*/
+    padding-left: 20%;
+    padding-right: 20%;
+    padding-bottom: 5%;
+}
+
+.consentExplanation {
+    font-size: 0.575rem; /* Custom font size */
+    color: #6c757d; /* Light gray color */
+    margin-top: 2%; /* Small top margin */
+}
+
+.fade-in {
+    animation: fadeIn 0.5s;
+}
+
+.fade-out {
+    animation: fadeOut 0.5s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}

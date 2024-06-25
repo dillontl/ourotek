@@ -1,5 +1,5 @@
-import Image from "next/image";
 import HeroAnimation from "@/app/components/lottie/hero-animation";
+import Link from "next/link";
 
 export default function MainHero(){
     return (
@@ -11,10 +11,13 @@ export default function MainHero(){
                         Ourotek unleashes future potential through <u className="uline">technological finesse.</u>
                     </p>
                     <div className="d-grid gap-2 d-md-flex justify-content-md-start mb-4 mb-lg-3">
+                        <Link href={`/consultation`}>
                         <button type="button" className="btn btn-primary btn-lg px-4 me-md-2 fw-bold">Lets Talk
                         </button>
+                        </Link>
                         {/*<button type="button" className="btn btn-outline-secondary btn-lg px-4">Articles</button>*/}
                     </div>
+                    <p><u>Consultations are free</u></p>
                 </div>
                 <div className="col-lg-4 offset-lg-1 p-0 overflow-hidden">
                     <HeroAnimation />
