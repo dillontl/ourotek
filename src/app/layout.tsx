@@ -5,6 +5,7 @@ import './globals.css'
 import Navigation from "@/app/components/navigation";
 import BootstrapInit from "@/app/components/bootstrap-init";
 import '@fortawesome/fontawesome-svg-core/styles.css'
+import Footer from "@/app/components/footer";
 
 const ibmPlexMono = IBM_Plex_Mono({ subsets: ['latin'], weight: ['100', '200', '300', '400', '500', '600', '700'] })
 
@@ -25,8 +26,9 @@ export default function RootLayout({
     <body className={ibmPlexMono.className}>
     {/* initialize bootstrap js */}
     <BootstrapInit />
-    <Navigation></Navigation>
+    <Navigation />
     {children}
+    <Footer />
     </body>
     </html>
   )
