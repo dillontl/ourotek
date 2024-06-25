@@ -8,8 +8,8 @@ export default function Home() {
   return (
       <main>
           <MainHero />
-          <MainAccordion />
           <MainContent />
+          <MainAccordion />
       </main>
   )
 }
