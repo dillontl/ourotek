@@ -1,4 +1,5 @@
 import Image from "next/image";
+import HeroAnimation from "@/app/components/lottie/hero-animation";
 
 export default function MainHero(){
     return (
@@ -12,12 +13,11 @@ export default function MainHero(){
                     <div className="d-grid gap-2 d-md-flex justify-content-md-start mb-4 mb-lg-3">
                         <button type="button" className="btn btn-primary btn-lg px-4 me-md-2 fw-bold">Lets Talk
                         </button>
-                        <button type="button" className="btn btn-outline-secondary btn-lg px-4">Articles</button>
+                        {/*<button type="button" className="btn btn-outline-secondary btn-lg px-4">Articles</button>*/}
                     </div>
                 </div>
-                <div className="col-lg-4 offset-lg-1 p-0 overflow-hidden shadow-lg">
-                    <Image className="rounded-lg-3" src={"/hero-image-app.png"} priority={true} alt="" height="400"
-                           width="720"/>
+                <div className="col-lg-4 offset-lg-1 p-0 overflow-hidden">
+                    <HeroAnimation />
                 </div>
             </div>
         </div>
