@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import styles from './page.module.css';
 import FormAnimation from "@/app/components/lottie/form-animation";
+import CheckboxAnimation from "@/app/components/lottie/checkbox-animation";
 
 export default function Page() {
     const [userStep, setUserStep] = useState(0);
@@ -177,6 +178,17 @@ export default function Page() {
                         </form>
                     </div>
                 );
+            case 2:
+                return (
+                    <div className={fadeClass}>
+                        <div className={styles.finalBox}>
+                            <h1>Looking forward to syncing up!</h1>
+                            <CheckboxAnimation />
+                            <p>{formData.firstName}, we are booked for apptDate</p>
+                            <p>Check your email for confirmation: {formData.email}</p>
+                        </div>
+                    </div>
+                    );
             // Add more cases here if you have more steps
             default:
                 return <p>Step not found</p>;
