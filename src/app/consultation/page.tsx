@@ -42,7 +42,7 @@ export default function Page() {
                 return (
                     <div className={fadeClass}>
                         <form>
-                            <h2>Let's get started!</h2>
+                            <h2>Let&apos;s get started!</h2>
                             <div className="mb-3">
                                 <label htmlFor="firstName" className="form-label">First Name</label>
                                 <input
