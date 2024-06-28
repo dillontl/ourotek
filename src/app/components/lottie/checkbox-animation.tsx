@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import Lottie from 'react-lottie';
-import animationData from './code-animation.json';
+import animationData from './checkbox-animation.json';
 
 export default function CheckboxAnimation(){
     const defaultOptions = {
