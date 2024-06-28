@@ -3,7 +3,7 @@ import GlobeAnimation from "@/app/components/lottie/globe-animation";
 export default function MainContent() {
     return (
         <div className="my-5 container">
-            <div className="pe-lg-0 align-items-center rounded-3 border shadow-lg">
+            <div className="pe-lg-0 align-items-center py-5 rounded-3 border shadow-lg">
                 <div className="my-3 mx-5">
                     <h2 className="border-bottom">OuroTek: Veteran Owned & Operated Software Consulting</h2>
 

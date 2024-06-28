@@ -1,10 +1,20 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowRight, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight, faEnvelope, faCalendar } from '@fortawesome/free-solid-svg-icons';
+import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import styles from './page.module.css';
 import FormAnimation from "@/app/components/lottie/form-animation";
 import CheckboxAnimation from "@/app/components/lottie/checkbox-animation";
+import Script from 'next/script';
+import { gapi } from 'gapi-script';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import moment from 'moment-timezone';
+
+const CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
+const SCOPES = 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events';
 
 export default function Page() {
     const [userStep, setUserStep] = useState(0);
@@ -18,8 +28,34 @@ export default function Page() {
         summary: '',
         companyName: '',
         phoneNumber: '',
+        appointmentDate: null,
+        timezone: moment.tz.guess(),
     });
     const [fadeClass, setFadeClass] = useState('fade-in');
+    const [gapiLoaded, setGapiLoaded] = useState(false);
+
+    useEffect(() => {
+        function start() {
+            gapi.client.init({
+                apiKey: API_KEY,
+                clientId: CLIENT_ID,
+                discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
+                scope: SCOPES,
+            }).then(() => {
+                const GoogleAuth = gapi.auth2.getAuthInstance();
+                if (!GoogleAuth.isSignedIn.get()) {
+                    GoogleAuth.signIn().then(() => {
+                        setGapiLoaded(true);
+                    });
+                } else {
+                    setGapiLoaded(true);
+                }
+            }).catch((error: any) => {
+                console.error('Error initializing Google API client:', error);
+            });
+        }
+        gapi.load('client:auth2', start);
+    }, []);
 
     const handleChange = (e: any) => {
         const { name, value, type, checked } = e.target;
@@ -29,12 +65,76 @@ export default function Page() {
         });
     };
 
+    const handleDateChange = (date: any) => {
+        setFormData({
+            ...formData,
+            appointmentDate: date
+        });
+    };
+
     const handleNext = () => {
         setFadeClass('fade-out');
         setTimeout(() => {
             setUserStep((prevStep) => prevStep + 1);
             setFadeClass('fade-in');
         }, 500);
+    };
+
+    const handleAuthAndCreateEvent = async () => {
+        if (!gapiLoaded) {
+            console.error('Google API client is not loaded yet.');
+            return;
+        }
+
+        const serviceChoice = formData.serviceType === 'Other' ? formData.otherService : formData.serviceType;
+        const startDateTime = moment.tz(formData.appointmentDate, formData.timezone).format();
+        const endDateTime = moment(startDateTime).add(1, 'hours').format();
+
+        const event = {
+            summary: `Consultation Call - ${serviceChoice}`,
+            description: `Consultation call with ${formData.firstName} ${formData.lastName} about ${serviceChoice}`,
+            start: {
+                dateTime: startDateTime,
+                timeZone: formData.timezone,
+            },
+            end: {
+                dateTime: endDateTime,
+                timeZone: formData.timezone,
+            },
+            attendees: [{ email: formData.email }],
+        };
+
+        const request = gapi.client.calendar.events.insert({
+            calendarId: 'primary',
+            resource: event,
+            sendUpdates: "all",  // Send notifications to all attendees
+        });
+
+        request.execute((event: any) => {
+            if (event.error) {
+                console.error('Error creating event:', event.error.message);
+            } else {
+                console.log('Event created: ', event.htmlLink);
+                setUserStep(4);
+            }
+        });
+    };
+
+    const handleCreateEventWithEmail = () => {
+        const serviceChoice = formData.serviceType === 'Other' ? formData.otherService : formData.serviceType;
+        const startDateTime = moment.tz(formData.appointmentDate, formData.timezone).format();
+        const endDateTime = moment(startDateTime).add(1, 'hours').format();
+
+        // Here, you can send an email to the provided address with the event details
+        // For example, using an email service API or simply displaying the event details to the user
+        console.log(`Event details:
+            Summary: Consultation Call - ${serviceChoice}
+            Description: Consultation call with ${formData.firstName} ${formData.lastName} about ${serviceChoice}
+            Start: ${startDateTime} (${formData.timezone})
+            End: ${endDateTime} (${formData.timezone})
+            Attendee: ${formData.email}`);
+
+        setUserStep(4);
     };
 
     const renderStep = () => {
@@ -181,15 +281,81 @@ export default function Page() {
             case 2:
                 return (
                     <div className={fadeClass}>
+                        <form>
+                            <h2>Schedule Your Consultation</h2>
+                            <div className="mb-3">
+                                <label htmlFor="appointmentDate" className="form-label">Select Date & Time</label>
+                                <DatePicker
+                                    selected={formData.appointmentDate}
+                                    onChange={handleDateChange}
+                                    showTimeSelect
+                                    timeFormat="HH:mm"
+                                    timeIntervals={30}
+                                    minTime={moment().hours(8).minutes(0).toDate()}
+                                    maxTime={moment().hours(20).minutes(0).toDate()}
+                                    dateFormat="MMMM d, yyyy h:mm aa"
+                                    className="form-control"
+                                />
+                            </div>
+                            <div className="mb-3">
+                                <label htmlFor="timezone" className="form-label">Select Timezone</label>
+                                <select
+                                    className="form-select"
+                                    id="timezone"
+                                    name="timezone"
+                                    value={formData.timezone}
+                                    onChange={handleChange}
+                                >
+                                    <option value="America/Los_Angeles">Pacific Time (PT)</option>
+                                    <option value="America/Denver">Mountain Time (MT)</option>
+                                    <option value="America/Chicago">Central Time (CT)</option>
+                                    <option value="America/New_York">Eastern Time (ET)</option>
+                                    <option value="UTC">Coordinated Universal Time (UTC)</option>
+                                    <option value="Europe/London">Greenwich Mean Time (GMT)</option>
+                                    <option value="Europe/Berlin">Central European Time (CET)</option>
+                                    <option value="Asia/Kolkata">India Standard Time (IST)</option>
+                                    <option value="Asia/Tokyo">Japan Standard Time (JST)</option>
+                                    <option value="Australia/Sydney">Australian Eastern Time (AET)</option>
+                                </select>
+                            </div>
+                            <button type="button" className="btn btn-primary mt-3" onClick={handleNext}>
+                                Next <FontAwesomeIcon icon={faArrowRight}/>
+                            </button>
+                        </form>
+                    </div>
+                );
+            case 3:
+                return (
+                    <div className={fadeClass}>
+                        <div>
+                            <h2>Review and Confirm</h2>
+                            <p><strong>Summary:</strong> Consultation Call - {formData.serviceType === 'Other' ? formData.otherService : formData.serviceType}</p>
+                            <p><strong>Description:</strong> Consultation call with {formData.firstName} {formData.lastName} about {formData.serviceType === 'Other' ? formData.otherService : formData.serviceType}</p>
+                            <p><strong>Start:</strong> {moment.tz(formData.appointmentDate, formData.timezone).format('MMMM Do YYYY, h:mm a')}</p>
+                            <p><strong>End:</strong> {moment.tz(formData.appointmentDate, formData.timezone).add(1, 'hours').format('MMMM Do YYYY, h:mm a')}</p>
+                            <p><strong>Timezone:</strong> {formData.timezone}</p>
+                            <p><strong>Attendee:</strong> {formData.email}</p>
+                            <button type="button" className="btn btn-primary mt-3" onClick={handleAuthAndCreateEvent}>
+                                Schedule using Google <FontAwesomeIcon icon={faGoogle}/>
+                            </button>
+                            <button type="button" className="btn btn-secondary mt-3 ms-3" onClick={handleCreateEventWithEmail}>
+                                Schedule with Email
+                            </button>
+                        </div>
+                    </div>
+                );
+            case 4:
+                return (
+                    <div className={fadeClass}>
                         <div className={styles.finalBox}>
                             <h1>Looking forward to syncing up!</h1>
-                            <CheckboxAnimation />
-                            <p>{formData.firstName}, we are booked for apptDate</p>
+                            <CheckboxAnimation/>
+                            <p>{formData.firstName}, we are booked
+                                for {moment(formData.appointmentDate).format('MMMM Do YYYY, h:mm a')}</p>
                             <p>Check your email for confirmation: {formData.email}</p>
                         </div>
                     </div>
-                    );
-            // Add more cases here if you have more steps
+                );
             default:
                 return <p>Step not found</p>;
         }
@@ -197,8 +363,9 @@ export default function Page() {
 
     return (
         <div className="my-5 container">
+            <Script src="https://apis.google.com/js/api.js" onLoad={() => setGapiLoaded(true)}/>
             <div className="pe-lg-0 align-items-center rounded-3 border shadow-lg">
-                <FormAnimation />
+                <FormAnimation/>
                 <div className={`my-3 mx-5 ${styles.consultForm}`}>
                     {renderStep()}
                 </div>
