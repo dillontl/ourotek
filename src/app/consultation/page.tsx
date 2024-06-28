@@ -23,6 +23,7 @@ const SCOPES =
   "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events";
 
 export default function Page() {
+  const isMobile = useMediaQuery("(max-width:600px)");
   const [userStep, setUserStep] = useState(0);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -39,34 +40,35 @@ export default function Page() {
   });
   const [fadeClass, setFadeClass] = useState("fade-in");
   const [gapiLoaded, setGapiLoaded] = useState(false);
-  const isMobile = useMediaQuery("(max-width:600px)");
 
   useEffect(() => {
-    function start() {
-      gapi.client
-        .init({
-          apiKey: API_KEY,
-          clientId: CLIENT_ID,
-          discoveryDocs: [
-            "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest",
-          ],
-          scope: SCOPES,
-        })
-        .then(() => {
-          const GoogleAuth = gapi.auth2.getAuthInstance();
-          if (!GoogleAuth.isSignedIn.get()) {
-            GoogleAuth.signIn().then(() => {
+    if (typeof window !== "undefined") {
+      function start() {
+        gapi.client
+          .init({
+            apiKey: API_KEY,
+            clientId: CLIENT_ID,
+            discoveryDocs: [
+              "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest",
+            ],
+            scope: SCOPES,
+          })
+          .then(() => {
+            const GoogleAuth = gapi.auth2.getAuthInstance();
+            if (!GoogleAuth.isSignedIn.get()) {
+              GoogleAuth.signIn().then(() => {
+                setGapiLoaded(true);
+              });
+            } else {
               setGapiLoaded(true);
-            });
-          } else {
-            setGapiLoaded(true);
-          }
-        })
-        .catch((error: any) => {
-          console.error("Error initializing Google API client:", error);
-        });
+            }
+          })
+          .catch((error: any) => {
+            console.error("Error initializing Google API client:", error);
+          });
+      }
+      gapi.load("client:auth2", start);
     }
-    gapi.load("client:auth2", start);
   }, []);
 
   const handleChange = (e: any) => {
@@ -137,7 +139,7 @@ export default function Page() {
     });
   };
 
-  const handleCreateEventWithEmail = () => {
+  const handleCreateEventWithEmail = async () => {
     const serviceChoice =
       formData.serviceType === "Other"
         ? formData.otherService
@@ -147,16 +149,39 @@ export default function Page() {
       .format();
     const endDateTime = moment(startDateTime).add(1, "hours").format();
 
-    // Here, you can send an email to the provided address with the event details
-    // For example, using an email service API or simply displaying the event details to the user
-    console.log(`Event details:
-            Summary: Consultation Call - ${serviceChoice}
-            Description: Consultation call with ${formData.firstName} ${formData.lastName} about ${serviceChoice}
-            Start: ${startDateTime} (${formData.timezone})
-            End: ${endDateTime} (${formData.timezone})
-            Attendee: ${formData.email}`);
+    const event = {
+      summary: `Consultation Call - ${serviceChoice}`,
+      description: `Consultation call with ${formData.firstName} ${formData.lastName} about ${serviceChoice}`,
+      start: {
+        dateTime: startDateTime,
+        timeZone: formData.timezone,
+      },
+      end: {
+        dateTime: endDateTime,
+        timeZone: formData.timezone,
+      },
+      attendees: [{ email: formData.email }],
+    };
 
-    setUserStep(4);
+    try {
+      const response = await fetch("/api/create-event", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(event),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Event created: ", data.htmlLink);
+        setUserStep(4);
+      } else {
+        console.error("Error creating event");
+      }
+    } catch (error) {
+      console.error("Error creating event: ", error);
+    }
   };
 
   const renderStep = () => {
