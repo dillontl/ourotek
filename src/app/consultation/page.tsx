@@ -325,6 +325,7 @@ export default function Page() {
                     </div>
                 );
             case 3:
+                // @ts-ignore
                 return (
                     <div className={fadeClass}>
                         <div>
