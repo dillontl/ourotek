@@ -2,16 +2,7 @@
 import nodemailer from 'nodemailer';
 import {NextRequest, NextResponse} from "next/server";
 
-interface emailData {
-    firstName: String,
-    lastName: String,
-    email: String,
-    serviceType: String,
-    otherServie: String,
-    summary: String,
-
-}
-export default async function handler(req: NextRequest, res: NextResponse) {
+export default async function POST(req: NextRequest, res: NextResponse) {
         // @ts-ignore
     const { firstName, lastName, email, serviceType, otherService, summary, companyName, phoneNumber, appointmentDate, timezone } = req.body;
 
